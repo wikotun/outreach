@@ -1,0 +1,29 @@
+.venv
+venv/
+.idea
+idea/
+__pycache__
+.DS_Store
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+
+# Python egg files
+*.egg-info
+# Distribution / packaging
+dist/
+build/
+develop-eggs/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheelhouse/
+`
