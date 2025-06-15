@@ -8,6 +8,9 @@ class AppConfig(BaseSettings):
     access_token_expire_minutes: int
     db_username: str
     db_password: str
+    host: str
+    port: int
+    log_level: str
 
     class Config:
         env_file = ".env"

@@ -38,11 +38,6 @@ def authenticate_user(username_or_email: str, password: str, db: Session = Depen
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-
-    # token_expiration_minutes: str | None = os.getenv("access_token_expire_minutes")
-    # secret_key: str | None = os.getenv("secret_key")
-    # algorithm_type: str | None = os.getenv("algorithm")
-
     expire = datetime.utcnow() + datetime.timedelta(
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES
     )

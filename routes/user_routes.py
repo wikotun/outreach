@@ -31,7 +31,7 @@ async def create_user(user: UserSchemaInput, db: Session = Depends(get_db_conn))
     return new_user
 
 
-@router.get("/read/{id}")
+@router.get("/read/{id}", response_model=UserSchema, description="Reads a user record from the database")
 async def get_user(id: int, db: Session = Depends(get_db_conn)):
     db_user = db.query(User).filter(User.id == id).first()
 
@@ -39,7 +39,7 @@ async def get_user(id: int, db: Session = Depends(get_db_conn)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="user not found in database")
     return db_user
 
-@router.get("/find/{username}")
+@router.get("/find/{username}", response_model=UserSchema, description="Finds a user by username")
 async def find_user(username: str, db: Session = Depends(get_db_conn)):
     db_user = db.query(User).filter(User.username == username).first()
 
@@ -58,3 +58,10 @@ async def delete_user(id: int, db: Session = Depends(get_db_conn)):
     db.delete(db_user)
     db.commit()
     return
+
+@router.get("/list", response_model=list[UserSchema], description="Lists all users in the database")
+async def list_all_users(db: Session= Depends(get_db_conn)):
+    users = db.query(User).all()
+    if not users:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No users found in database")
+    return users

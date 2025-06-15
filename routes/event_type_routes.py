@@ -58,4 +58,5 @@ async def delete_event_type(id: int, db: Session = Depends(get_db_conn)):
 
 @router.get("/list", response_model=list[EventTypeSchema])
 async def get_event_types(db: Session = Depends(get_db_conn)):
+    print(f"Fetching all event types from {settings.db_username}")
     return db.query(EventType).all()
