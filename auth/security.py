@@ -4,9 +4,9 @@ from fastapi import Depends
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from config.db import get_db_conn
+from config.app_config import settings
 from models import User
 from email_validator import validate_email, EmailNotValidError
-import os
 from jose import jwt, JWTError
 from routes import user_routes
 
@@ -14,6 +14,9 @@ pwd_context = CryptContext(
     schemes=["bcrypt"], deprecated="auto"
 )
 
+SECRET_KEY = settings.secret_key
+ALGORITHM = settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 def authenticate_user(username_or_email: str, password: str, db: Session = Depends(get_db_conn)) -> User | None:
     try:
@@ -36,16 +39,17 @@ def authenticate_user(username_or_email: str, password: str, db: Session = Depen
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
 
-    token_expiration_minutes: str | None = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
-    secret_key: str | None = os.getenv("SECRET_KEY")
-    algorithm_type: str | None = os.getenv("ALGORITHM")
+    # token_expiration_minutes: str | None = os.getenv("access_token_expire_minutes")
+    # secret_key: str | None = os.getenv("secret_key")
+    # algorithm_type: str | None = os.getenv("algorithm")
+
     expire = datetime.utcnow() + datetime.timedelta(
-        minutes=token_expiration_minutes
+        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
     )
 
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(
-        to_encode, secret_key, algorithm=algorithm_type
+        to_encode, SECRET_KEY, algorithm=ALGORITHM
     )
     return encoded_jwt
 
@@ -53,7 +57,7 @@ def create_access_token(data: dict) -> str:
 def decode_access_token(token: str) -> User | None:
     try:
         payload = jwt.decode(
-            token, os.getenv("SECRET_KEY"), algorithms=[os.getenv("ALGORITHM")]
+            token, SECRET_KEY, algorithms=ALGORITHM
         )
         username: str = payload.get("sub")
     except JWTError:

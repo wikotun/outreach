@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from config.db import get_db_conn
 from models import User
 from schemas.user import UserSchema, UserSchemaInput
-from security.auth_filter import pwd_context
-from domain.constants import Role
+from auth.security import pwd_context
+from schemas.role import Role
 
 router = APIRouter(
     prefix="/user",
