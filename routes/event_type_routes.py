@@ -4,6 +4,7 @@ from config.db import get_db_conn
 from models import EventType
 from schemas.event_type import EventTypeSchema, EventTypeSchemaInput
 from config.app_config import settings
+import logging
 
 router = APIRouter(
     prefix="/type",

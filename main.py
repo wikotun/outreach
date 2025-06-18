@@ -13,9 +13,12 @@ from routes.user_routes import router as user_router
 from routes.security_routes import router as security_router
 from alembic import command
 from alembic.config import Config
+import logging
+import tracemalloc
 
 app = FastAPI()
 
+logger = logging.getLogger('main')
 
 @app.on_event("startup")
 def startup_event():
@@ -23,6 +26,10 @@ def startup_event():
     # Apply migrations
     alembic_cfg = Config("alembic.ini")
     command.upgrade(alembic_cfg, "head")
+
+
+tracemalloc.start()
+
 
 
 @app.exception_handler(StarletteHTTPException)
