@@ -51,10 +51,6 @@ async def create_access_token(data: dict) -> str:
 
 async def decode_access_token(token: str,db:Session) -> User:
 
-    print(f"Decoding token: {token}")
-    print(f"Using secret key: {SECRET_KEY}")
-    print(f"Using algorithm: {ALGORITHM}")
-
     try:
         payload = jwt.decode(
             token, SECRET_KEY, algorithms=ALGORITHM
