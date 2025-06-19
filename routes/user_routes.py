@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from config.db import get_db_conn
 from models import User
 from schemas.user import UserSchema, UserSchemaInput
-from auth.security import pwd_context
+from auth.security import get_password_hash
 from schemas.role import Role
 
 router = APIRouter(
@@ -19,8 +19,7 @@ router = APIRouter(
 async def create_user(user: UserSchemaInput, db: Session = Depends(get_db_conn)):
     new_user = User(**user.model_dump())
     new_user.user_role = Role.MEMBER.value
-    pwd_hash = pwd_context.hash(user.password)
-    new_user.password = pwd_hash
+    new_user.password = get_password_hash(user.password)
     db.add(new_user)
 
     try:
