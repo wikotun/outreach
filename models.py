@@ -66,7 +66,7 @@ class User(SQLModel, table=True):
     first_name: str = Field(index=False, nullable=True, max_length=50)
     last_name: str = Field(index=False, nullable=True, max_length=50)
     email: str = Field(index=True, nullable=False, max_length=100)
-    user_role: str =  Field(nullable=True,max_length=20)
+    user_role: str = Field(nullable=True, max_length=20)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     def __repr__(self):

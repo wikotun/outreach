@@ -1,19 +1,24 @@
 import json
-from dotenv import load_dotenv
+import uvicorn
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import JSONResponse, PlainTextResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from config.db import init_db
+from config.app_config import settings
 from routes.event_type_routes import router as event_type_router
 from routes.event_routes import router as event_router
 from routes.participant_routes import router as participant_router
 from routes.user_routes import router as user_router
+from routes.security_routes import router as security_router
 from alembic import command
 from alembic.config import Config
+import logging
+import tracemalloc
 
-
-load_dotenv()
 app = FastAPI()
+
+logger = logging.getLogger('main')
 
 @app.on_event("startup")
 def startup_event():
@@ -23,23 +28,18 @@ def startup_event():
     command.upgrade(alembic_cfg, "head")
 
 
-@app.exception_handler(HTTPException)
+tracemalloc.start()
+
+
+
+@app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request, exc):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "detail": exc.detail
-        },
-    )
+    return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    return PlainTextResponse(
-        "This is a plain text response:"
-        f"\n{json.dumps(exc.errors(), indent=2)}",
-        status_code=status.HTTP_400_BAD_REQUEST,
-    )
+async def validation_exception_handler(request, exc):
+    return PlainTextResponse(str(exc), status_code=400)
 
 
 # Include routers
@@ -47,3 +47,7 @@ app.include_router(event_type_router)
 app.include_router(event_router)
 app.include_router(participant_router)
 app.include_router(user_router)
+app.include_router(security_router)
+
+if __name__ == "__main__":
+    uvicorn.run(app, host=settings.host, port=settings.port, log_level=settings.log_level)
