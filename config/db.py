@@ -1,8 +1,8 @@
 from sqlmodel import Session, create_engine,SQLModel
 from models import EventType, Event, Participant,User
+from config.app_config import settings
 
-
-DATABASE_URL = "sqlite:///./database.db"
+DATABASE_URL = settings.database_url
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
 def init_db():
