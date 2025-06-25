@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from config.db import get_db_conn
 from models import EventType
 from schemas.event_type import EventTypeSchema, EventTypeSchemaInput
-import os
+from config.app_config import settings
+import logging
 
 router = APIRouter(
     prefix="/type",
@@ -58,5 +59,5 @@ async def delete_event_type(id: int, db: Session = Depends(get_db_conn)):
 
 @router.get("/list", response_model=list[EventTypeSchema])
 async def get_event_types(db: Session = Depends(get_db_conn)):
-    print("token-expiration-time -> "+ os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+    print(f"Fetching all event types from {settings.db_username}")
     return db.query(EventType).all()
