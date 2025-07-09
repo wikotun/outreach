@@ -24,8 +24,8 @@ logger = logging.getLogger('main')
 def startup_event():
     init_db()
     # Apply migrations
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
+    # alembic_cfg = Config("alembic.ini")
+    # command.upgrade(alembic_cfg, "head")
 
 
 tracemalloc.start()
