@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from config.db import get_db_conn
@@ -77,12 +77,12 @@ async def decode_access_token(token: str, db: Session) -> User:
         return None
 
     print(f"Finding user with username: {username}")
-    user = user_routes.find_user(username, db)
+    user = await user_routes.find_user(username, db)
     print(f"Found user: {user}")
     return user
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db_conn)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -94,11 +94,10 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         username = payload.get("sub")
         if username is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
 
-    user = user_routes.find_user(token_data.username, db)
+    user = await user_routes.find_user(username, db)
     if user is None:
         raise credentials_exception
     return user

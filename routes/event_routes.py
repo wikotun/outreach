@@ -52,7 +52,7 @@ async def get_event(id: int, db: Session = Depends(get_db_conn), responses={
     event = db.query(Event).filter(Event.id == id).first()
 
     if not event:
-        raise HTTPException(status_code=c, detail="Event type not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
     return event
 
 
@@ -126,7 +126,7 @@ async def delete_event(id: int, db: Session = Depends(get_db_conn)):
         }})
 async def add_participant_to_event(event_id: int, participant: ParticipantSchemaInput,
                                    db: Session = Depends(get_db_conn)):
-    event = db.query(Event).filter(Event.id == id).first()
+    event = db.query(Event).filter(Event.id == event_id).first()
 
     if not event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event record not found")
@@ -134,7 +134,7 @@ async def add_participant_to_event(event_id: int, participant: ParticipantSchema
     db_participant = Participant(**participant.model_dump())
     db.add(db_participant)
 
-    event.participants.add(participant)
+    event.participants.append(db_participant)
     db.add(event)
     db.commit()
     db.refresh(event)
