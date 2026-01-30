@@ -30,7 +30,7 @@ async def create_event(event: EventSchemaInput, db: Session = Depends(get_db_con
     return new_evnt
 
 
-@router.get("/list", response_model=EventSchema, description="Returns the events in the database", responses={
+@router.get("/list", response_model=list[EventSchema], description="Returns the events in the database", responses={
     404: {
         "description": "Item not found",
     },
@@ -56,7 +56,7 @@ async def get_event(id: int, db: Session = Depends(get_db_conn), responses={
     return event
 
 
-@router.get("/list/{start_date}/{end_date}", response_model=EventSchema,
+@router.get("/list/{start_date}/{end_date}", response_model=list[EventSchema],
             description="Returns events in the database for a given date range", responses={
         404: {
             "description": "Item not found",
@@ -68,7 +68,7 @@ async def find_events_by_date(start_date: date, end_date: date, db: Session = De
     return (db.query(Event).filter
         (
         (Event.event_date >= start_date) & (Event.event_date <= end_date)
-    )
+    ).all()
     )
 
 

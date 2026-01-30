@@ -43,7 +43,7 @@ async def delete_participant(id: int, db: Session=Depends(get_db_conn)):
     return
 
 
-@router.get("/list",response_model=ParticipantSchema,description="Returns all the participants in the database")
+@router.get("/list",response_model=list[ParticipantSchema],description="Returns all the participants in the database")
 async def list_all_participants(db: Session=Depends(get_db_conn)):
     return db.query(Participant).all()
 
