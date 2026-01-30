@@ -14,7 +14,13 @@ router = APIRouter(
 )
 
 
-@router.post("/create", response_model=EventSchema, description="Creates an event record in the database")
+@router.post("/create", response_model=EventSchema, description="Creates an event record in the database", responses={
+    404: {
+        "description": "Item not found",
+    },
+    500: {
+        "description": "Server error"
+    }})
 async def create_event(event: EventSchemaInput, db: Session = Depends(get_db_conn)):
     new_evnt = Event(**event.model_dump())
     db.add(new_evnt)
@@ -24,31 +30,55 @@ async def create_event(event: EventSchemaInput, db: Session = Depends(get_db_con
     return new_evnt
 
 
-@router.get("/list", response_model=EventSchema, description="Returns the events in the database")
+@router.get("/list", response_model=EventSchema, description="Returns the events in the database", responses={
+    404: {
+        "description": "Item not found",
+    },
+    500: {
+        "description": "Server error"
+    }})
 async def get_events(db: Session = Depends(get_db_conn)):
     return db.query(Event).all()
 
 
 @router.get("/read/{id}", response_model=EventSchema)
-async def get_event(id: int, db: Session = Depends(get_db_conn)):
+async def get_event(id: int, db: Session = Depends(get_db_conn), responses={
+    404: {
+        "description": "Item not found",
+    },
+    500: {
+        "description": "Server error"
+    }}):
     event = db.query(Event).filter(Event.id == id).first()
 
     if not event:
-        raise HTTPException(status_code=c, detail="Event type not found")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event not found")
     return event
 
 
 @router.get("/list/{start_date}/{end_date}", response_model=EventSchema,
-            description="Returns events in the database for a given date range")
+            description="Returns events in the database for a given date range", responses={
+        404: {
+            "description": "Item not found",
+        },
+        500: {
+            "description": "Server error"
+        }})
 async def find_events_by_date(start_date: date, end_date: date, db: Session = Depends(get_db_conn)):
     return (db.query(Event).filter
         (
-            (Event.event_date >= start_date) & (Event.event_date <= end_date)
-        )
+        (Event.event_date >= start_date) & (Event.event_date <= end_date)
+    )
     )
 
 
-@router.put("/update/{id}", response_model=EventSchema, description="Updates an event record")
+@router.put("/update/{id}", response_model=EventSchema, description="Updates an event record", responses={
+    404: {
+        "description": "Item not found",
+    },
+    500: {
+        "description": "Server error"
+    }})
 async def update_event(id: int, evnt: EventSchemaInput, db: Session = Depends(get_db_conn)):
     db_evnt = db.query(Event).filter(Event.id == id).first()
 
@@ -66,7 +96,15 @@ async def update_event(id: int, evnt: EventSchemaInput, db: Session = Depends(ge
 
     return db_evnt
 
-@router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description="Deletes a given event record")
+
+@router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT, description="Deletes a given event record",
+               responses={
+                   404: {
+                       "description": "Item not found",
+                   },
+                   500: {
+                       "description": "Server error"
+                   }})
 async def delete_event(id: int, db: Session = Depends(get_db_conn)):
     event = db.query(Event).filter(Event.id == id).first()
 
@@ -77,23 +115,28 @@ async def delete_event(id: int, db: Session = Depends(get_db_conn)):
     db.commit()
     return
 
-@router.post("/participant/add/{event_id}",response_model=EventSchema,description="Adds a participant record to an event")
-async def add_participant_to_event(event_id:int, participant: ParticipantSchemaInput, db: Session = Depends(get_db_conn)):
-    event = db.query(Event).filter(Event.id == id).first()
+
+@router.post("/participant/add/{event_id}", response_model=EventSchema,
+             description="Adds a participant record to an event", responses={
+        404: {
+            "description": "Item not found",
+        },
+        500: {
+            "description": "Server error"
+        }})
+async def add_participant_to_event(event_id: int, participant: ParticipantSchemaInput,
+                                   db: Session = Depends(get_db_conn)):
+    event = db.query(Event).filter(Event.id == event_id).first()
 
     if not event:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Event record not found")
 
-    db_participant =  Participant(**participant.model_dump())
+    db_participant = Participant(**participant.model_dump())
     db.add(db_participant)
 
-    event.participants.add(participant)
+    event.participants.append(db_participant)
     db.add(event)
     db.commit()
     db.refresh(event)
 
     return event
-
-
-
-

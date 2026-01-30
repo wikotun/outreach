@@ -25,7 +25,7 @@ async def list_participants(event_id: int,db: Session=Depends(get_db_conn)):
     return db.query(Participant).filter(Participant.event_id == event_id)
 
 
-@router.get("/read{id}",response_model=ParticipantSchema,description="Returns the details for a given participant id")
+@router.get("/read/{id}",response_model=ParticipantSchema,description="Returns the details for a given participant id")
 async def get_participant(id: int, db: Session=Depends(get_db_conn)):
     participant = db.query(Participant).filter(Participant.id == id).first()
 
