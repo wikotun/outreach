@@ -5,28 +5,25 @@ including database initialization, router registration,
 and exception handlers.
 """
 
-import json
+import logging
 import os
-import uvicorn
+import tracemalloc
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Request, status
+from typing import AsyncGenerator
+import uvicorn
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from starlette.responses import JSONResponse, PlainTextResponse, FileResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from config.db import init_db
+from starlette.responses import PlainTextResponse, FileResponse
 from config.app_config import settings
-from routes.event_type_routes import router as event_type_router
+from config.db import init_db
 from routes.event_routes import router as event_router
+from routes.event_type_routes import router as event_type_router
 from routes.participant_routes import router as participant_router
-from routes.user_routes import router as user_router
 from routes.security_routes import router as security_router
-from alembic import command
-from alembic.config import Config
-import logging
-import tracemalloc
-from typing import AsyncGenerator
+from routes.user_routes import router as user_router
 
 logger = logging.getLogger('main')
 

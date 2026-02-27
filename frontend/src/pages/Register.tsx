@@ -119,9 +119,16 @@ export function Register() {
               {...register('confirmPassword')}
             />
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Creating account...' : 'Create account'}
-            </Button>
+            <div className="flex gap-3">
+              <Link to="/login" className="flex-1">
+                <Button variant="secondary" type="button" className="w-full">
+                  Cancel
+                </Button>
+              </Link>
+              <Button type="submit" className="flex-1" disabled={isLoading}>
+                {isLoading ? 'Creating account...' : 'Create account'}
+              </Button>
+            </div>
           </form>
 
           <p className="mt-4 text-center text-sm text-gray-600">
