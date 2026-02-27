@@ -1,4 +1,4 @@
-.PHONY: help install run dev test lint clean migrate migrate-new freeze frontend-install frontend-dev frontend-build
+.PHONY: help install run dev test lint clean migrate migrate-new freeze frontend-install frontend-dev frontend-build build
 
 PYTHON := python
 VENV := venv
@@ -20,6 +20,7 @@ help:
 	@echo "  make frontend-install - Install frontend dependencies"
 	@echo "  make frontend-dev     - Run frontend dev server"
 	@echo "  make frontend-build   - Build frontend for production"
+	@echo "  make build            - Build frontend and package with backend"
 
 install:
 	$(PYTHON) -m venv $(VENV)
@@ -60,3 +61,6 @@ frontend-dev:
 
 frontend-build:
 	cd frontend && npm run build
+
+build: frontend-build
+	@echo "Frontend built and packaged in /static"

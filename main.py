@@ -65,7 +65,6 @@ app.add_middleware(
 tracemalloc.start()
 
 
-
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> PlainTextResponse:
     """Handle HTTP exceptions and return plain text responses.
@@ -104,7 +103,8 @@ app.include_router(security_router)
 # Serve static files for production
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if os.path.exists(static_dir):
-    app.mount("/assets", StaticFiles(directory=os.path.join(static_dir, "assets")), name="assets")
+    app.mount(
+        "/assets", StaticFiles(directory=os.path.join(static_dir, "assets")), name="assets")
 
     @app.get("/{full_path:path}")
     async def serve_spa(full_path: str):
@@ -115,4 +115,5 @@ if os.path.exists(static_dir):
         raise HTTPException(status_code=404, detail="Not found")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=settings.host, port=settings.port, log_level=settings.log_level)
+    uvicorn.run(app, host=settings.host, port=settings.port,
+                log_level=settings.log_level)

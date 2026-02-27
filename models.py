@@ -71,7 +71,7 @@ class Event(SQLModel, table=True):
     )
 
     def __repr__(self):
-        return f"Event(id={self.id}, name='{self.name}', description='{self.description}', location='{self.location}',event_type_id={self.event_type_id},created_at='{self.created_at}')"
+        return f"Event(id={self.id}, name='{self.name}', description='{self.description}', location='{self.location}', event_type_id={self.event_type_id}, created_at='{self.created_at}')"
 
 
 class Participant(SQLModel, table=True):
@@ -115,7 +115,7 @@ class Participant(SQLModel, table=True):
                 f"last_name='{self.last_name}', email='{self.email}', "
                 f"phone='{self.phone}', address='{self.address}', "
                 f"city='{self.city}', state='{self.state}', "
-                f"zip_code='{self.zip_code}', created_at='{self.created_at}',event_id={self.event_id})")
+                f"zip_code='{self.zip_code}', created_at='{self.created_at}', event_id={self.event_id})")
 
 
 class User(SQLModel, table=True):
@@ -147,4 +147,4 @@ class User(SQLModel, table=True):
     created_at: datetime = Field(default_factory=utc_now)
 
     def __repr__(self):
-        return f"User(id={self.id}, username='{self.username}',first_name='{self.first_name}', last_name='{self.last_name}', email='{self.email}', created_at='{self.created_at}')"
+        return f"User(id={self.id}, username='{self.username}', first_name='{self.first_name}', last_name='{self.last_name}', email='{self.email}', created_at='{self.created_at}')"
