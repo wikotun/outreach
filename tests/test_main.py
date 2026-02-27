@@ -16,15 +16,15 @@ async def ac():
         yield ac
 
 
-# Test startup event
+# Test lifespan startup
 @pytest.mark.asyncio
 async def test_startup_event():
     with patch('main.init_db') as mock_init_db:
-        # Call the startup event
-        await app.router.startup()
-
-        # Verify init_db was called
-        mock_init_db.assert_called_once()
+        from main import lifespan
+        # Enter the lifespan context to trigger startup
+        async with lifespan(app):
+            # Verify init_db was called during startup
+            mock_init_db.assert_called_once()
 
 
 # Test HTTP exception handler

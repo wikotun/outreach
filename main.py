@@ -1,5 +1,13 @@
+"""Outreach application main entry point.
+
+This module configures and starts the FastAPI application,
+including database initialization, router registration,
+and exception handlers.
+"""
+
 import json
 import uvicorn
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import JSONResponse, PlainTextResponse
@@ -15,30 +23,62 @@ from alembic import command
 from alembic.config import Config
 import logging
 import tracemalloc
-
-app = FastAPI()
+from typing import AsyncGenerator
 
 logger = logging.getLogger('main')
 
-@app.on_event("startup")
-def startup_event():
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """Manage application startup and shutdown lifecycle.
+
+    Initializes the database on startup. Can optionally apply
+    Alembic migrations if uncommented.
+
+    Args:
+        app: The FastAPI application instance.
+
+    Yields:
+        Control to the application after startup is complete.
+    """
     init_db()
     # Apply migrations
     # alembic_cfg = Config("alembic.ini")
     # command.upgrade(alembic_cfg, "head")
+    yield
 
+
+app = FastAPI(lifespan=lifespan)
 
 tracemalloc.start()
 
 
 
 @app.exception_handler(StarletteHTTPException)
-async def http_exception_handler(request, exc):
+async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> PlainTextResponse:
+    """Handle HTTP exceptions and return plain text responses.
+
+    Args:
+        request: The incoming request that caused the exception.
+        exc: The HTTP exception that was raised.
+
+    Returns:
+        Plain text response with the error detail and status code.
+    """
     return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request, exc):
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> PlainTextResponse:
+    """Handle request validation errors.
+
+    Args:
+        request: The incoming request that failed validation.
+        exc: The validation error containing details about what failed.
+
+    Returns:
+        Plain text response with validation error details and 400 status.
+    """
     return PlainTextResponse(str(exc), status_code=400)
 
 

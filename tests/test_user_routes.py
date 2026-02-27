@@ -21,7 +21,8 @@ async def test_create_user(client: AsyncClient, db_session):
 
     # Verify the password was actually hashed correctly
     from models import User
-    db_user = db_session.query(User).filter(User.id == data["id"]).first()
+    from sqlmodel import select
+    db_user = db_session.exec(select(User).where(User.id == data["id"])).first()
     assert verify_password("mypassword", db_user.password)
 
 
