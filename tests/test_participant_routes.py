@@ -26,7 +26,8 @@ async def test_create_participant(client: AsyncClient, create_event):
 @pytest.mark.asyncio
 async def test_list_participants_by_event(client: AsyncClient, create_participant, create_event):
     ev = create_event(name="Participant Event")
-    create_participant(first_name="Bob", email="bob@example.com", event_id=ev.id)
+    create_participant(
+        first_name="Bob", email="bob@example.com", event_id=ev.id)
     response = await client.get(f"/participant/list/{ev.id}")
     assert response.status_code == 200
     data = response.json()

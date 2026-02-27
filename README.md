@@ -1,6 +1,6 @@
 # Outreach
 
-A FastAPI-based REST API for managing community outreach events, participants, and user authentication.
+A full-stack application for managing community outreach events, participants, and user authentication. Built with FastAPI backend and React + TypeScript frontend.
 
 ## Features
 
@@ -9,16 +9,27 @@ A FastAPI-based REST API for managing community outreach events, participants, a
 - **Participant Tracking** — Register and manage event participants
 - **User Management** — User accounts with role-based access (Member, Admin)
 - **Authentication** — JWT-based authentication with bcrypt password hashing
+- **React Frontend** — Modern SPA with Tailwind CSS styling
 - **Database Migrations** — Schema versioning with Alembic
 
 ## Tech Stack
 
+### Backend
 - **Framework:** FastAPI + Uvicorn
 - **ORM:** SQLModel (SQLAlchemy + Pydantic)
 - **Database:** SQLite (default), with MySQL and PostgreSQL support
 - **Auth:** JWT via python-jose, bcrypt via passlib
 - **Testing:** pytest with httpx async client
 - **Migrations:** Alembic
+
+### Frontend
+- **Framework:** React 18 + TypeScript
+- **Build Tool:** Vite
+- **Routing:** React Router v6
+- **Forms:** react-hook-form + zod validation
+- **HTTP Client:** Axios with JWT interceptors
+- **Styling:** Tailwind CSS
+- **Icons:** Lucide React
 
 ## Project Structure
 
@@ -31,7 +42,20 @@ outreach/
 ├── tests/              # Test suite with fixtures
 ├── alembic/            # Database migration scripts
 ├── models.py           # SQLModel ORM models
-└── main.py             # Application entry point
+├── main.py             # Application entry point
+├── frontend/           # React SPA
+│   ├── src/
+│   │   ├── api/        # Axios client with JWT interceptors
+│   │   ├── components/ # Reusable UI components
+│   │   ├── contexts/   # React Context (Auth)
+│   │   ├── pages/      # Route-level components
+│   │   ├── routes/     # Routing configuration
+│   │   ├── types/      # TypeScript definitions
+│   │   └── App.tsx
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── tailwind.config.js
+└── static/             # Built frontend (production)
 ```
 
 ## Getting Started
@@ -39,6 +63,7 @@ outreach/
 ### Prerequisites
 
 - Python 3.12+
+- Node.js 18+
 
 ### Installation
 
@@ -47,13 +72,11 @@ outreach/
 git clone https://github.com/wikotun/outreach.git
 cd outreach
 
-# Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate  # macOS/Linux
-venv\Scripts\activate     # Windows
+# Install backend dependencies
+make install
 
-# Install dependencies
-pip install -r requirements.txt
+# Install frontend dependencies
+make frontend-install
 ```
 
 ### Configuration
@@ -74,19 +97,45 @@ log_level="debug"
 
 ### Running the Application
 
-```bash
-python main.py
-```
-
-Or with uvicorn directly:
+**Development mode** (two terminals):
 
 ```bash
-uvicorn main:app --host localhost --port 8000 --reload
+# Terminal 1: Start backend
+make dev
+
+# Terminal 2: Start frontend
+make frontend-dev
 ```
 
-The API will be available at `http://localhost:8000`. Interactive docs are served at `/docs` (Swagger UI) and `/redoc` (ReDoc).
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- API Docs: http://localhost:8000/docs
 
-## API Endpoints
+**Production mode:**
+
+```bash
+# Build frontend
+make frontend-build
+
+# Run backend (serves static files)
+make run
+```
+
+### Available Make Commands
+
+| Command | Description |
+|---------|-------------|
+| `make install` | Create venv and install Python dependencies |
+| `make dev` | Run backend with hot reload |
+| `make run` | Run backend in production mode |
+| `make test` | Run tests |
+| `make frontend-install` | Install frontend dependencies |
+| `make frontend-dev` | Run frontend dev server |
+| `make frontend-build` | Build frontend for production |
+| `make migrate` | Apply database migrations |
+| `make migrate-new msg='...'` | Create a new migration |
+
+## API Reference
 
 ### Event Types (`/type`)
 
@@ -140,14 +189,7 @@ The API will be available at `http://localhost:8000`. Interactive docs are serve
 ## Running Tests
 
 ```bash
-# Run all tests
-pytest
-
-# Run with verbose output
-pytest -v
-
-# Run a specific test file
-pytest tests/test_event_routes.py
+make test
 ```
 
 Tests use an in-memory SQLite database and cover all major endpoints including error cases.
@@ -156,13 +198,10 @@ Tests use an in-memory SQLite database and cover all major endpoints including e
 
 ```bash
 # Generate a new migration after model changes
-alembic revision --autogenerate -m "description of changes"
+make migrate-new msg="description of changes"
 
 # Apply migrations
-alembic upgrade head
-
-# Rollback one migration
-alembic downgrade -1
+make migrate
 ```
 
 ## License

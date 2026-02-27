@@ -4,7 +4,8 @@ from httpx import AsyncClient
 
 @pytest.mark.asyncio
 async def test_login_for_access_token(client: AsyncClient, create_user):
-    create_user(username="authuser", password="authpass", email="auth@example.com")
+    create_user(username="authuser", password="authpass",
+                email="auth@example.com")
     response = await client.post("/security/token", params={
         "login": "authuser",
         "pwd": "authpass",
@@ -17,7 +18,8 @@ async def test_login_for_access_token(client: AsyncClient, create_user):
 
 @pytest.mark.asyncio
 async def test_login_invalid_credentials(client: AsyncClient, create_user):
-    create_user(username="badlogin", password="realpass", email="bad@example.com")
+    create_user(username="badlogin", password="realpass",
+                email="bad@example.com")
     response = await client.post("/security/token", params={
         "login": "badlogin",
         "pwd": "wrongpass",

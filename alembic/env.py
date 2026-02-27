@@ -4,7 +4,7 @@ from sqlalchemy import pool
 from alembic import context
 from sqlmodel import SQLModel
 
-from models import EventType, Event,Participant,User
+from models import EventType, Event, Participant, User
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -16,7 +16,6 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
-from models import EventType,Event,Participant,User
 target_metadata = SQLModel.metadata
 
 # other values from the config, defined by the needs of env.py,
