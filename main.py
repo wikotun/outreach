@@ -97,6 +97,12 @@ app.include_router(participant_router)
 app.include_router(user_router)
 app.include_router(security_router)
 
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring."""
+    return {"status": "ok"}
+
 # Serve static files for production
 static_dir = os.path.join(os.path.dirname(__file__), "static")
 if os.path.exists(static_dir):

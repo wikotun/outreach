@@ -24,12 +24,11 @@ router = APIRouter(
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/security/token")
 
 @router.post("/token", response_model=Token)
-async def login_for_access_token(login: str, pwd: str, db: Session = Depends(get_db_conn)) -> Token:
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db_conn)) -> Token:
     """Authenticate user and return a JWT access token.
 
     Args:
-        login: Username for authentication.
-        pwd: Password for authentication.
+        form_data: OAuth2 form containing username and password.
         db: Database session.
 
     Returns:
@@ -38,7 +37,7 @@ async def login_for_access_token(login: str, pwd: str, db: Session = Depends(get
     Raises:
         HTTPException: 401 error if credentials are invalid.
     """
-    user = await authenticate_user(login, pwd, db)
+    user = await authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -60,15 +60,7 @@ async def test_validation_exception_handler():
 # Test health check endpoint
 @pytest.mark.asyncio
 async def test_health_check(ac: AsyncClient):
-    # Add a health check endpoint for testing
-    @app.get("/health")
-    async def health_check():
-        return {"status": "ok"}
-
-    # Make the request
     response = await ac.get("/health")
-
-    # Verify the response
     assert response.status_code == status.HTTP_200_OK
     assert response.json() == {"status": "ok"}
 

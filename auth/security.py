@@ -13,7 +13,6 @@ from config.app_config import settings
 from models import User
 from email_validator import validate_email, EmailNotValidError
 from jose import jwt, JWTError
-from routes import user_routes
 from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer
 
@@ -27,6 +26,19 @@ ALGORITHM = settings.algorithm
 ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+def find_user_by_username(username: str, db: Session) -> User | None:
+    """Find a user by username.
+
+    Args:
+        username: The username to search for.
+        db: Database session.
+
+    Returns:
+        The User object if found, None otherwise.
+    """
+    return db.exec(select(User).where(User.username == username)).first()
 
 
 def get_password_hash(password: str) -> str:
@@ -115,7 +127,7 @@ async def decode_access_token(token: str, db: Session) -> User | None:
     """
     try:
         payload = jwt.decode(
-            token, SECRET_KEY, algorithms=ALGORITHM
+            token, SECRET_KEY, algorithms=[ALGORITHM]
         )
         username: str = payload.get("sub")
         print(f"Decoded username: {username}")
@@ -126,7 +138,7 @@ async def decode_access_token(token: str, db: Session) -> User | None:
         return None
 
     print(f"Finding user with username: {username}")
-    user = await user_routes.find_user(username, db)
+    user = find_user_by_username(username, db)
     print(f"Found user: {user}")
     return user
 
@@ -161,7 +173,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Se
     except JWTError:
         raise credentials_exception
 
-    user = await user_routes.find_user(username, db)
+    user = find_user_by_username(username, db)
     if user is None:
         raise credentials_exception
     return user

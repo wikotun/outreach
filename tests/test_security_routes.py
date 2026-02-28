@@ -6,9 +6,9 @@ from httpx import AsyncClient
 async def test_login_for_access_token(client: AsyncClient, create_user):
     create_user(username="authuser", password="authpass",
                 email="auth@example.com")
-    response = await client.post("/security/token", params={
-        "login": "authuser",
-        "pwd": "authpass",
+    response = await client.post("/security/token", data={
+        "username": "authuser",
+        "password": "authpass",
     })
     assert response.status_code == 200
     data = response.json()
@@ -20,9 +20,9 @@ async def test_login_for_access_token(client: AsyncClient, create_user):
 async def test_login_invalid_credentials(client: AsyncClient, create_user):
     create_user(username="badlogin", password="realpass",
                 email="bad@example.com")
-    response = await client.post("/security/token", params={
-        "login": "badlogin",
-        "pwd": "wrongpass",
+    response = await client.post("/security/token", data={
+        "username": "badlogin",
+        "password": "wrongpass",
     })
     assert response.status_code == 401
 
@@ -31,9 +31,9 @@ async def test_login_invalid_credentials(client: AsyncClient, create_user):
 async def test_get_current_user(client: AsyncClient, create_user):
     create_user(username="meuser", password="mepass", email="me@example.com")
     # First, get a token
-    token_resp = await client.post("/security/token", params={
-        "login": "meuser",
-        "pwd": "mepass",
+    token_resp = await client.post("/security/token", data={
+        "username": "meuser",
+        "password": "mepass",
     })
     assert token_resp.status_code == 200
     token = token_resp.json()["access_token"]

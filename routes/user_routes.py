@@ -44,6 +44,10 @@ async def create_user(user: UserSchemaInput, db: Session = Depends(get_db_conn))
         db.refresh(new_user)
     except IntegrityError:
         db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Username or email already exists"
+        )
     return new_user
 
 

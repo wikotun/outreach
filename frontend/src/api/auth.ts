@@ -3,9 +3,14 @@ import { Token, User, UserInput } from '../types';
 
 export const authApi = {
   login: async (username: string, password: string): Promise<Token> => {
-    const response = await apiClient.post<Token>(
-      `/security/token?login=${encodeURIComponent(username)}&pwd=${encodeURIComponent(password)}`
-    );
+    const formData = new URLSearchParams();
+    formData.append('username', username);
+    formData.append('password', password);
+    const response = await apiClient.post<Token>('/security/token', formData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
     return response.data;
   },
 
